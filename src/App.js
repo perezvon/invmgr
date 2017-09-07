@@ -25,7 +25,7 @@ export default class App extends React.Component {
   }
 
   getSubscriptionData = () => {
-    fetch('https://localhost:3001/api/products/')
+    fetch('/api/products/')
       .then(res => res.json())
       .then(json => {
         this.setState({
@@ -33,7 +33,7 @@ export default class App extends React.Component {
         })
       })
       .then(() => {
-        fetch('https://localhost:3001/api/invoices/')
+        fetch('/api/invoices/')
         .then(res => res.json())
         .then(json => {
           json.forEach(i => i.date = moment(i.date).format("MM/DD/YYYY"))
@@ -43,7 +43,7 @@ export default class App extends React.Component {
         })
       })
       .then(() => {
-        fetch('https://localhost:3001/api/vendors/')
+        fetch('/api/vendors/')
         .then(res => res.json())
         .then(json => {
           this.setState({
@@ -111,7 +111,7 @@ export default class App extends React.Component {
     const coll = page + 's';
     console.log(this.state[page])
     const body = JSON.stringify(this.state[page]);
-    const url = isNew ? 'https://localhost:3001/api/' + coll + '/' : 'http://localhost:3001/api/' + coll + '/' + id
+    const url = isNew ? '/api/' + coll + '/' : '/api/' + coll + '/' + id
     fetch(url, {
       method: isNew ? 'POST' : 'PUT',
       headers: {
@@ -143,7 +143,7 @@ export default class App extends React.Component {
           delete item.place;
           const json = JSON.stringify(item);
           console.log(json)
-          fetch('https://localhost:3001/api/products', {
+          fetch('/api/products', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -171,7 +171,7 @@ export default class App extends React.Component {
   submitOrders = (e) => {
     e.preventDefault()
     const body = JSON.stringify(this.state.inventoryNeeds)
-    fetch('https://localhost:3001/api/submitOrders', {
+    fetch('/api/submitOrders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
