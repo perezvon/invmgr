@@ -12,8 +12,18 @@ const app = express();
 //set our port to either a predetermined port number if you have set it up, or 3001
 const port = process.env.API_PORT || 3001;
 
+const uristring =
+    process.env.MONGODB_URI ||
+    process.env.MONGOHQ_URL ||
+    'mongodb://localhost/invmgr';
 //db config
-mongoose.connect('mongodb://localhost/invmgr');
+mongoose.connect(uristring, (err, res) => {
+      if (err) {
+      console.log ('ERROR connecting to: ' + uristring + '. ' + err);
+      } else {
+      console.log ('Succeeded connected to: ' + uristring);
+      }
+  });
 
 //now we should configure the APi to use bodyParser and look for JSON data in the body
 app.use(bodyParser.urlencoded({ extended: true }));
