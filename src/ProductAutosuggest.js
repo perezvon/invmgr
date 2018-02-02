@@ -29,7 +29,7 @@ export default class ProductAutosuggest extends React.Component {
 
   getSuggestionValue = (suggestion) => {
     console.log(suggestion)
-    this.props.handleMasterStateUpdate(suggestion, 'invoice');
+    this.props.handleMasterStateUpdate(suggestion, 'product');
     return suggestion.productId;
   }
 

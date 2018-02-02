@@ -5,7 +5,6 @@ require('dotenv').config()
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const path = require('path');
 const router = require('./router')
 //and create our instances
 const app = express();
@@ -29,12 +28,14 @@ mongoose.connect(uristring, (err, res) => {
 //now we should configure the APi to use bodyParser and look for JSON data in the body
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+if (process.env.REACT_APP_ENV !=='localhost') {
+  const path = require('path');
 app.use(express.static(path.resolve(__dirname, 'build')));
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
+}
 //To prevent errors from Cross Origin Resource Sharing, we will set our headers to allow CORS with middleware like so:
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');

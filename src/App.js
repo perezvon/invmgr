@@ -47,7 +47,11 @@ export default class App extends React.Component {
         .then(res => res.json())
         .then(json => {
           this.setState({
-            vendors: json,
+            vendors: json
+          })
+        })
+        .then(() => {
+          this.setState({
             loading: false
           })
           this.getInventoryNeeds()
@@ -75,12 +79,11 @@ export default class App extends React.Component {
   }
 
   handleMasterStateUpdate = (e, page) => {
-    console.log(e)
     if (e.target) {
       const target = e.target;
       const value = target.type === 'checkbox' ? target.checked : target.value;
       const name = target.name;
-      this.setState((prevState) =>({
+      this.setState((prevState) => ({
         [page]: {
           ...prevState[page],
           [name]: value
@@ -109,11 +112,23 @@ export default class App extends React.Component {
   handleSubmit = (e, page, isNew, id) => {
     e.preventDefault();
     const coll = page + 's';
-    console.log(this.state[page])
-    const body = JSON.stringify(this.state[page]);
-    const url = isNew ? '/api/' + coll + '/' : '/api/' + coll + '/' + id
+    let data, method, url;
+    if (page === 'invoice') {
+      method = 'POST'
+      url = '/api/' + coll + '/'
+      data = this.state.product;
+      data.invoiceNum = this.state.invoice.invoiceNum;
+      data.date = this.state.invoice.date;
+      data.vendor = this.state.invoice.vendor;
+      console.log(data)
+    } else {
+      data = this.state[page]
+      method = isNew ? 'POST' : 'PUT';
+      url = isNew ? '/api/' + coll + '/' : '/api/' + coll + '/' + id
+    }
+    const body = JSON.stringify(data);
     fetch(url, {
-      method: isNew ? 'POST' : 'PUT',
+      method: method,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -142,7 +157,6 @@ export default class App extends React.Component {
           }
           delete item.place;
           const json = JSON.stringify(item);
-          console.log(json)
           fetch('/api/products', {
             method: 'POST',
             headers: {
@@ -158,8 +172,25 @@ export default class App extends React.Component {
   setActiveItem = (page, id) => {
     const coll = page + 's';
     if (coll === 'invoices') {
+      let data = {date: moment().format('YYYY-MM-DD')} ;
+      if (id) {
+        let temp = this.state.invoices.filter(i => i.invoiceNum === id)
+        data.invoiceNum = temp[0].invoiceNum;
+        data.date = temp[0].date;
+        data.vendor = temp[0].vendor;
+        data.data = [];
+        temp.forEach(line => {
+          if (!line.name) line.name = ''
+          data.data.push({
+            productId: line.productId,
+            price: line.price,
+            name: line.name,
+            qty: line.qty
+        })
+      })
+    }
       this.setState(prevState => ({
-        [page]: id ? prevState[coll].filter(i => i.invoiceNum === id) : {date: moment().format('YYYY-MM-DD')}
+        [page]: data
       }))
     } else {
       this.setState(prevState => ({
@@ -190,11 +221,9 @@ export default class App extends React.Component {
   const {loading, products, vendors, invoices, product, vendor, invoice, inventoryNeeds} = this.state;
     if (loading) return <Loading />
     else {
-        const uniqueInvoiceNums = []//_.uniq(invoices.map(i => i.invoiceNum))
-        const uniqueInvoices = []//uniqueInvoiceNums.map(i => _.find(invoices, j => j.invoiceNum === i))
-        const invoiceTableData = []/*invoices.filter(i => i.invoiceNum === invoice.invoiceNum).map((item, index) => {
-          <tr key={index}><td>item.productId</td><td>item.name</td><td>item.qty</td><td>item.price</td></tr>
-        })*/
+        const uniqueInvoiceNums = !_.isEmpty(invoices) ? _.uniq(invoices.filter(i => !!i.invoiceNum).map(i => i.invoiceNum)) : []
+        const uniqueInvoices = _.sortBy(uniqueInvoiceNums.map(i => _.find(invoices, j => j.invoiceNum === i)), 'date').reverse()
+        const invoiceTableData = [] //!_.isEmpty(invoices) ? invoices.filter(i => i.invoiceNum === invoice.invoiceNum).map((item, index) => {<tr key={index}><td>item.productId</td><td>item.name</td><td>item.qty</td><td>item.price</td></tr>}) : []
         const toOrder = inventoryNeeds.map((item, index) =>
           <tr key={index}><td>{item.vendor}</td><td>{item.productId}</td><td>{item.name}</td><td>{item.qty}</td></tr>
         )

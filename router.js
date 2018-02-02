@@ -134,6 +134,7 @@ router.route('/products/:product_id')
       //post new invoice to the database
       .post(function(req, res) {
         var invoice = new Invoice();
+        console.log(req.headers)
         for (var key in req.body) {
           req.body[key] ? invoice[key] = req.body[key] : null;
         }
@@ -142,6 +143,7 @@ router.route('/products/:product_id')
           if (err)
             res.send(err);
           res.json({ message: 'Invoice successfully added!' });
+          res.end()
         });
       });
 
@@ -177,7 +179,8 @@ router.route('/products/:product_id')
       //route to send email orders to vendors
       router.route('/submitOrders')
         .post(function(req, res) {
-          const company = '"calihan catering orders" <johnm@calihancatering.com>'
+          const company = process.env.COMPANY_EMAIL || '"orders" <orders@distantbluesoftware.com>'
+          const companyName = process.env.COMPANY_NAME || "Distant Blue Software"
           let data = [];
           const uniqueVendors = _.uniq(req.body.map(i => i.vendor).sort())
           uniqueVendors.forEach(v => {
@@ -191,7 +194,7 @@ router.route('/products/:product_id')
                 let mailOptions = {
                     from: company, // sender address
                     to: email.contact_email_1,// list of receivers
-                    subject: 'Order for ' + moment().add(1, 'days').format('MM/DD/YYYY'), // Subject line
+                    subject: 'Order from ' + companyName + '—' + moment().add(1, 'days').format('MM/DD/YYYY'), // Subject line
                     text: array[0].vendor + '\n' + 'Product # -- Name -- QTY \n' + vendorOrderText, // plain text body
                     html: '<h2 style="color: #999;">Hello,</h2> <p>Please see the below order. Let me know if there are any questions. Thanks!</p><p>' + array[0].vendor + '</p>' + '<table style="border: 1px solid black; border-collapse:collapse; width:100%;"><thead><th>Product#</th><th>Name</th><th>QTY</th></thead><tbody>'+vendorOrderHtml+'</tbody></table>' // html body
                 };

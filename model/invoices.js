@@ -9,6 +9,7 @@ var InvoiceSchema = new Schema({
  date: Date,
  invoiceNum: String,
  productId: String,
+ name: String,
  qty: Number,
  price: Number,
  vendor: String
