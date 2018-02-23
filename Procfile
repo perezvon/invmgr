@@ -1,2 +1,2 @@
-api: node server/server.js
-web: PORT=3000 react-scripts start
+web: node server/server.js
+api: PORT=3000 npm start
