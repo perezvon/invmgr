@@ -1,7 +1,7 @@
 function getInventoryData(callback) {
   const https = require("https");
-  const locationKey = process.env.LOCATION_KEY || "R1ZEBZ7BKH6FY"
-  const authKey = process.env.AUTH_KEY || "sq0atp-D6N20L9fuAIu7NbLUY5raA"
+  const locationKey = process.env.LOCATION_KEY
+  const authKey = process.env.AUTH_KEY
 
   var options = {
   "method": "GET",
