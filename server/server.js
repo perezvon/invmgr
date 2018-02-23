@@ -17,7 +17,7 @@ const uristring =
     process.env.MONGOHQ_URL ||
     'mongodb://localhost/invmgr';
 //db config
-mongoose.connect(uristring, (err, res) => {
+mongoose.connect(uristring, {useMongoClient: true}, (err, res) => {
       if (err) {
       console.log ('ERROR connecting to: ' + uristring + '. ' + err);
       } else {

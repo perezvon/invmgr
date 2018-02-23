@@ -1,5 +1,5 @@
 //batch update products
-const Product = require('./model/products');
+const Product = require('./models/products');
 const moment = require('moment')
 
 Product.find({pack: 1, size: 6, unit: '#10'}, function (err, products) {

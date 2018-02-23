@@ -1,9 +1,24 @@
 import React from 'react'
 import {Row, Col, FormGroup, FormControl, ControlLabel, Button} from 'react-bootstrap'
+import { connect } from 'react-redux'
+import agent from '../agent'
+import { VIEW_PRODUCT } from '../constants/actionTypes'
 
-export default class ProductDetail extends React.Component {
-  componentWillMount = () => {
-    this.props.setActiveItem('product', this.props.isNew ? '' : this.props.match.params.id)
+const mapStateToProps = state => {
+  return {
+    product: state.product,
+    vendors: state.vendors
+  }
+}
+
+const mapDispatchToProps = dispatch => ({
+  onLoad: (pager, payload) =>
+    dispatch({ type: VIEW_PRODUCT, pager, payload })
+});
+
+class ProductDetail extends React.Component {
+  componentDidMount = () => {
+    this.props.onLoad(agent.Products.get, agent.Products.get(this.props.match.params.id))
   }
 
   render () {
@@ -162,3 +177,5 @@ export default class ProductDetail extends React.Component {
     )
   }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductDetail)
